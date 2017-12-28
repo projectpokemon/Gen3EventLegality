@@ -79,7 +79,7 @@ public class Gen3EventChecker
 
     { 2005, Tuple.Create("Festa/ROCKS Metang", Algo.BACDPIDIV | Algo.MaleOTG) },
 
-    { 50901, Tuple.Create("Hado Titans", Algo.DSPlay | Algo.BACDPIDIV | Algo.RandOTG4) },
+    { 50901, Tuple.Create("Hado Titans", Algo.DSPlay | Algo.ItemFirst | Algo.BACDPIDIV | Algo.RandOTG4) },
 
     { 60505, Tuple.Create("GCEA 6th Campaign", Algo.BACDPIDIV | Algo.RandOTG3) },
 
@@ -452,7 +452,7 @@ public class Gen3EventChecker
                         Console.WriteLine("Nature: {0}", index2Nature(PID % 25));
 
                         Console.WriteLine("Shiny: Cannot be shiny");
-
+                        
                         uint[] ivs = ParseStats((rand3 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
                         Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
 
@@ -460,17 +460,26 @@ public class Gen3EventChecker
 
                         // Console.WriteLine("Item: {0}", (((rand6 >> 0x15) / 1) & 1) == 0 ? "Ganlon" : "Salac");
 
-                        uint newSeed = seed;
+                        uint d = Prev(rand1, algo);
+                        uint c = Prev(d, algo);
+                        uint b = Prev(c, algo);
+                        uint a = Prev(b, algo);
+
+                        // Console.WriteLine("Entry: {0}", GetRandomEntry((c & 0xFFFF0000) | (d >> 0x10), 5));
+                        // Console.WriteLine("Entry: {0}", (((rand6 >> 0x10) / 1) >> 0) % 3);
+                        // Console.WriteLine("Entry: {0}", GetRandomEntry(d >> 0x10, 5));
+                        
+                        /*uint newSeed = seed;
 
                         for (int h = 0; h < 1000000; h++)
                         {
-                            if (newSeed == 0x7ADB8160)
+                            if (newSeed == 0xDCA0BCA8)
                             {
                                 Console.WriteLine("Test: {0:X8} - Frame {1}", newSeed, h);
                             }
 
                             newSeed = Next(newSeed, algo);
-                        }
+                        }*/
 
                         another = true;
                     }
@@ -661,7 +670,7 @@ public class Gen3EventChecker
                     else if (Has(algo, Algo.FemaleOTG))
                         Console.WriteLine("OTG: Female (Always)");
                     else if (Has(algo, Algo.RandOTG4))
-                        Console.WriteLine("OTG: {0} (Not definitive)", (((itemRand >> 0x1E) / 1) & 1) == 1 ? "Female" : "Male");
+                        Console.WriteLine("OTG: {0} (Not Definitive)", (((otgRand >> 0x1E) / 1) & 1) == 1 ? "Female" : "Male");
 
                     if (Has(algo, Algo.RandItem3))
                         Console.WriteLine("Item: {0}", ((itemRand >> 0x17) & 1) == 0 ? "Salac Berry" : "Ganlon Berry");
@@ -688,6 +697,9 @@ public class Gen3EventChecker
                 Console.WriteLine("----------");
             }
         }
+
+        Console.WriteLine("Complete. Press enter to exit.");
+        Console.ReadLine();
     }
 
     public static bool isShiny(uint pid, uint tid, uint sid)
@@ -783,16 +795,16 @@ public class Gen3EventChecker
 
     public static Tuple<string, string, uint, bool>[] PCJP2003Types = new Tuple<string, string, uint, bool>[]
     {
-    new Tuple<string,string,uint,bool>("Pichu","Teeter Dance",100, false),
-    new Tuple<string,string,uint,bool>("Pichu","Teeter Dance",25, true),
-    new Tuple<string,string,uint,bool>("Pichu","Wish",100, false),
-    new Tuple<string,string,uint,bool>("Pichu","Wish",25, true),
-    new Tuple<string,string,uint,bool>("Bagon","Iron Defense",125, false),
-    new Tuple<string,string,uint,bool>("Bagon","Wish",125, false),
-    new Tuple<string,string,uint,bool>("Absol","Spite",125, false),
-    new Tuple<string,string,uint,bool>("Absol","Wish",125, false),
-    new Tuple<string,string,uint,bool>("Ralts","Charm",125, false),
-    new Tuple<string,string,uint,bool>("Ralts","Wish",125, false),
+      new Tuple<string,string,uint,bool>("Pichu","Teeter Dance",100, false),
+      new Tuple<string,string,uint,bool>("Pichu","Teeter Dance",25, true),
+      new Tuple<string,string,uint,bool>("Pichu","Wish",100, false),
+      new Tuple<string,string,uint,bool>("Pichu","Wish",25, true),
+      new Tuple<string,string,uint,bool>("Bagon","Iron Defense",125, false),
+      new Tuple<string,string,uint,bool>("Bagon","Wish",125, false),
+      new Tuple<string,string,uint,bool>("Absol","Spite",125, false),
+      new Tuple<string,string,uint,bool>("Absol","Wish",125, false),
+      new Tuple<string,string,uint,bool>("Ralts","Charm",125, false),
+      new Tuple<string,string,uint,bool>("Ralts","Wish",125, false),
     };
 
     public static uint Prev(uint seed, Algo algo)
