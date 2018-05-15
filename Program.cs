@@ -452,7 +452,7 @@ public class Gen3EventChecker
                         Console.WriteLine("Nature: {0}", index2Nature(PID % 25));
 
                         Console.WriteLine("Shiny: Cannot be shiny");
-                        
+
                         uint[] ivs = ParseStats((rand3 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
                         Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
 
@@ -468,7 +468,7 @@ public class Gen3EventChecker
                         // Console.WriteLine("Entry: {0}", GetRandomEntry((c & 0xFFFF0000) | (d >> 0x10), 5));
                         // Console.WriteLine("Entry: {0}", (((rand6 >> 0x10) / 1) >> 0) % 3);
                         // Console.WriteLine("Entry: {0}", GetRandomEntry(d >> 0x10, 5));
-                        
+
                         /*uint newSeed = seed;
 
                         for (int h = 0; h < 1000000; h++)
@@ -515,7 +515,7 @@ public class Gen3EventChecker
 
                         forcedShiny = entry.Item4;
 
-                        if (forcedShiny)
+                        if (forcedShiny && Has(algo, Algo.PCJP2003))
                             algo |= Algo.CanBeShiny;
                     }
 
