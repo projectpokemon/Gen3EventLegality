@@ -454,10 +454,10 @@ public class Gen3EventChecker
 
             // Console.WriteLine("Item: {0}", (((rand6 >> 0x15) / 1) & 1) == 0 ? "Ganlon" : "Salac");
 
-            uint d = Prev(rand1, algo);
-            uint c = Prev(d, algo);
-            uint b = Prev(c, algo);
-            uint a = Prev(b, algo);
+            //uint d = Prev(rand1, algo);
+            //uint c = Prev(d, algo);
+            //uint b = Prev(c, algo);
+            //uint a = Prev(b, algo);
 
             // Console.WriteLine("Entry: {0}", GetRandomEntry((c & 0xFFFF0000) | (d >> 0x10), 5));
             // Console.WriteLine("Entry: {0}", (((rand6 >> 0x10) / 1) >> 0) % 3);
@@ -607,7 +607,7 @@ public class Gen3EventChecker
               mystryMewBatch = String.Format("{0}/{1} {2}", mewIndex, MystryMewSeeds.Length, batchSlot);
             }
             else
-              mystryMewBatch = String.Format(" ({0} of 5)", batchCount - 1);
+              mystryMewBatch = String.Format("({0} of 5)", batchCount - 1);
           }
 
           Console.WriteLine("{0}: {1:X8} - {2} {3}", knownSeed, i, option.Item1, mystryMewBatch);
