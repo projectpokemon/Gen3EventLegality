@@ -5,52 +5,53 @@ using System.Collections.Generic;
 
 public class Gen3EventChecker
 {
+  private static string version = "1.2";
 
-    [Flags]
-    public enum Algo : ulong
+  [Flags]
+  public enum Algo : ulong
+  {
+    Unknown = 0x00000000,
+    WSHMKR = 0x00000010,
+    Offset = 0x00000020,
+    ForceShiny = 0x00000040,
+    RandOTG1 = 0x00000080, // X / 3 & 1
+    RandOTG2 = 0x00000100, // X >> 3 & 1
+    BACDPIDIV = 0x00000200,
+    RandOTG3 = 0x00000400, // X >> 7 & 1
+    WCEggs = 0x00000800,
+    LimitRange = 0x00001000,
+    PokeParkEggs = 0x00002000,
+    DSPlay = 0x00004000,
+    BerryGlitch = 0x00008000,
+    NoIVs = 0x00010000,
+    PCJP2003 = 0x00020000,
+    CanBeShiny = 0x00040000,
+    RandItem1 = 0x00080000, // X / 3 & 1
+    RandItem2 = 0x00100000, // X >> 3 & 1
+    RandItem3 = 0x00200000, // X >> 7 & 1
+    MaleOTG = 0x00400000,
+    FemaleOTG = 0x00800000,
+    ItemFirst = 0x01000000, // OTG1/2 generally use this
+    Stamp = 0x02000000, // Absol Item
+    DFABPIDIV = 0x04000000,
+    Box = 0x08000000,
+    BatchGen = 0x10000000, // Mystry Mew
+    ForceAntiShiny = 0x20000000,
+    UnknownOTG = 0x40000000,
+  }
+
+  public static Dictionary<string, Algo> EventOptions = new Dictionary<string, Algo>
     {
-        Unknown = 0x00000000,
-        WSHMKR = 0x00000010,
-        Offset = 0x00000020,
-        ForceShiny = 0x00000040,
-        RandOTG1 = 0x00000080, // X / 3 & 1
-        RandOTG2 = 0x00000100, // X >> 3 & 1
-        BACDPIDIV = 0x00000200,
-        RandOTG3 = 0x00000400, // X >> 7 & 1
-        WCEggs = 0x00000800,
-        LimitRange = 0x00001000,
-        PokeParkEggs = 0x00002000,
-        DSPlay = 0x00004000,
-        BerryGlitch = 0x00008000,
-        NoIVs = 0x00010000,
-        PCJP2003 = 0x00020000,
-        CanBeShiny = 0x00040000,
-        RandItem1 = 0x00080000, // X / 3 & 1
-        RandItem2 = 0x00100000, // X >> 3 & 1
-        RandItem3 = 0x00200000, // X >> 7 & 1
-        MaleOTG = 0x00400000,
-        FemaleOTG = 0x00800000,
-        ItemFirst = 0x01000000, // OTG1/2 generally use this
-        Stamp = 0x02000000, // Absol Item
-        DFABPIDIV = 0x04000000,
-        Box = 0x08000000,
-        RandOTG4 = 0x10000000, // X >> E & 1 (rng6)
-        BatchGen = 0x20000000, // Mystry Mew\
-        ForceAntiShiny = 0x40000000,
-        UnknownOTG = 0x80000000,
-    }
+        { "5th Anniv Eggs", Algo.PCJP2003 | Algo.BACDPIDIV | Algo.Offset },
+        { "PCJP 2004/PCNY WISH Eggs", Algo.WCEggs },
+        { "PokePark 2005 Eggs", Algo.PokeParkEggs | Algo.CanBeShiny },
+        { "Pokemon Box Eggs", Algo.Box | Algo.BACDPIDIV },
+        { "E-Reader", Algo.DFABPIDIV | Algo.NoIVs | Algo.CanBeShiny },
+        { "PCNYbcd", Algo.ForceAntiShiny },
+        { "None", Algo.Unknown }
+    };
 
-    public static Dictionary<string, Algo> EventOptions = new Dictionary<string, Algo> {
-    { "5th Anniv Eggs", Algo.PCJP2003 | Algo.BACDPIDIV | Algo.Offset },
-    { "PCJP 2004/PCNY WISH Eggs", Algo.WCEggs },
-    { "PokePark 2005 Eggs", Algo.PokeParkEggs | Algo.CanBeShiny },
-    { "Pokemon Box Eggs", Algo.Box | Algo.BACDPIDIV },
-    { "E-Reader", Algo.DFABPIDIV | Algo.NoIVs | Algo.CanBeShiny },
-    { "PCNYabcd", Algo.ForceAntiShiny | Algo.UnknownOTG },
-    { "None", Algo.Unknown }
-  };
-
-    public static Dictionary<uint, Tuple<string, Algo>> EventsByID = new Dictionary<uint, Tuple<string, Algo>> {
+  public static Dictionary<uint, Tuple<string, Algo>> EventsByID = new Dictionary<uint, Tuple<string, Algo>> {
     { 30719, Tuple.Create("Wishing Star Jirachi", Algo.BACDPIDIV | Algo.Offset | Algo.RandItem1 | Algo.MaleOTG) },
 
     { 20043, Tuple.Create("Wishmaker/METEOR Jirachi (20043)", Algo.BACDPIDIV | Algo.WSHMKR | Algo.RandItem1 | Algo.CanBeShiny) },
@@ -79,7 +80,7 @@ public class Gen3EventChecker
 
     { 2005, Tuple.Create("Festa/ROCKS Metang", Algo.BACDPIDIV | Algo.MaleOTG) },
 
-    { 50901, Tuple.Create("Hado Titans", Algo.DSPlay | Algo.ItemFirst | Algo.BACDPIDIV | Algo.RandOTG4) },
+    { 50901, Tuple.Create("Hado Titans", Algo.DSPlay | Algo.ItemFirst | Algo.BACDPIDIV | Algo.UnknownOTG) },
 
     { 60505, Tuple.Create("GCEA 6th Campaign", Algo.BACDPIDIV | Algo.RandOTG3) },
 
@@ -122,9 +123,9 @@ public class Gen3EventChecker
     { 6930, Tuple.Create("Mystery Mew", Algo.BACDPIDIV | Algo.BatchGen | Algo.RandOTG1) }
   };
 
-    public static uint[] MystryMewSeeds = new uint[] {
-    0x5189E6C6, 0x00006065, 0xFFFAB298, 0x6A8A580A, 0x66461CE9,
-    0x00000000, 0xE8D1A0BF, 0x0000E6CC, 0x39AEB123, 0xF6B75FDE,
+  public static uint[] MystryMewSeeds = {
+    0x5189E6C6, 0x00005E2B, 0x5ADFDAC6, 0x83A723B5, 0x8AF5BCA8,
+    0xA587868F, 0xE8D1A0BF, 0x0000E6CC, 0x39AEB123, 0xF6B75FDE,
     0xFF889A6D, 0x0ACAC680, 0x00005841, 0xD30AA204, 0x65E00D7B,
     0x3BCB20D6, 0x077B5585, 0x000020BF, 0x849ED80A, 0xE1289CE9,
     0x329A3E0C, 0x08027B63, 0x0000E95D, 0xF29915B0, 0x9E85FD77,
@@ -208,694 +209,688 @@ public class Gen3EventChecker
     0xC347774A, 0x23608F29, 0x0000967D, 0x1C565650, 0x4F6B6397,
     0xEDD28582, 0xBBBAB281, 0x00005EF3, 0x70E04A6E, 0x51D0FEBD,
     0x88912D90, 0xC53AADD7, 0x00000932, 0x3F4C9371, 0xA20A3C74,
-    0x8CA75A2B,
+    0x8CA75A2B, 0x00006065, 0xFFFAB298, 0x6A8A580A, 0x66461CE9,
   };
 
-    public static void Main(string[] args)
+  public static void Main(string[] args)
+  {
+    Console.WriteLine("3rd Gen Legality Checker by Sabresite (v{0})", version);
+    Tuple<string, Algo> option;
+    uint TID;
+
+    Console.WriteLine("If an egg event or PCNY, press enter");
+    Console.Write("TID:");
+    bool gotTID = GetNumber(out TID);
+    bool foundEvent = EventsByID.TryGetValue(TID, out option);
+
+    if (!(gotTID && foundEvent))
     {
-        Tuple<string, Algo> option;
-        uint TID;
+      if (gotTID)
+        Console.WriteLine("Could not find event by TID. Maybe it is an egg event or PCNY?");
 
-        Console.WriteLine("If an egg event or PCNY, press enter");
-        Console.Write("TID:");
-        bool gotTID = GetNumber(out TID);
-        bool foundEvent = EventsByID.TryGetValue(TID, out option);
+      int index;
+      Dictionary<String, Algo>.KeyCollection keys = EventOptions.Keys;
+      do
+      {
+        int count = 0;
+        foreach (string eventName in keys)
+          Console.WriteLine("{0}. {1}", (++count).ToString().PadLeft(2), eventName);
 
-        if (!(gotTID && foundEvent))
+        Console.Write("----------\nChoose an event by number:");
+      } while (!Int32.TryParse(Console.ReadLine(), out index) || index < 0 || index > EventOptions.Keys.Count);
+
+      KeyValuePair<string, Algo> choice = EventOptions.ElementAt(index - 1);
+
+      if (choice.Value == Algo.Unknown)
+        return;
+
+      option = Tuple.Create(choice.Key, choice.Value);
+    }
+
+    Algo algo = option.Item2;
+
+    bool forcedShiny = Has(algo, Algo.ForceShiny);
+    bool WCEggs = Has(algo, Algo.WCEggs);
+    bool hasOffset = Has(algo, Algo.Offset);
+    bool berryGlitch = Has(algo, Algo.BerryGlitch);
+    bool XDAlgo = Has(algo, Algo.DFABPIDIV);
+    bool Box = Has(algo, Algo.Box);
+    bool mystryMew = TID == 6930;
+    bool batchGen = Has(algo, Algo.BatchGen);
+    bool noIVs = Has(algo, Algo.NoIVs);
+    bool forceAntishiny = Has(algo, Algo.ForceAntiShiny);
+
+    List<Tuple<uint, uint, uint>> PIDTIDs = new List<Tuple<uint, uint, uint>>();
+    bool finished;
+    do
+    {
+      Console.Write("PID <TID> <SID>:");
+      uint pid, tid, sid;
+      finished = !GetNumber(out pid, out tid, out sid);
+      if (!finished) PIDTIDs.Add(new Tuple<uint, uint, uint>(pid, tid > 0 ? tid : TID, sid));
+    } while (!finished);
+
+    Console.WriteLine("----------");
+
+    uint seedRange = Has(algo, Algo.LimitRange) ? 0x100u : 0x10000u;
+
+    uint rand1, rand1a, rand1b, rand2, rand3, rand4, rand5, rand6;
+
+    for (int p = 0; p < PIDTIDs.Count; p++)
+    {
+      uint PID = PIDTIDs[p].Item1;
+      TID = PIDTIDs[p].Item2;
+      uint SID = PIDTIDs[p].Item3;
+
+      bool found = false;
+
+      if (XDAlgo)
+      {
+        bool another = false;
+
+        // XD - Do it backwards - DFAB
+        for (uint i = 0; XDAlgo && i < seedRange; i++)
         {
-            if (gotTID)
-                Console.WriteLine("Could not find event by TID. Maybe it is an egg event or PCNY?");
+          uint pid;
+          uint seed = ((PID & 0xFFFF) << 0x10) | i;
 
-            int index;
-            Dictionary<String, Algo>.KeyCollection keys = EventOptions.Keys;
-            do
-            {
-                int count = 0;
-                foreach (string eventName in keys)
-                    Console.WriteLine("{0}. {1}", (++count).ToString().PadLeft(2), eventName);
+          do
+          {
+            rand1 = seed;
+            rand2 = Prev(rand1, algo);
+            rand3 = Prev(rand2, algo);
 
-                Console.Write("----------\nChoose an event by number:");
-            } while (!Int32.TryParse(Console.ReadLine(), out index) || index < 0 || index > EventOptions.Keys.Count);
+            pid = ((rand2 >> 0x10) << 0x10) | (rand1 >> 0x10);
 
-            KeyValuePair<string, Algo> choice = EventOptions.ElementAt(index - 1);
+            seed = rand3;
 
-            if (choice.Value == Algo.Unknown)
-                return;
+          } while (!noIVs && isShiny(pid, TID, SID));
 
-            option = Tuple.Create(choice.Key, choice.Value);
+          if (pid == PID)
+          {
+            if (another)
+              Console.WriteLine(" - ");
+
+            found = true;
+
+            rand4 = Prev(rand3, algo); // IV2
+            rand5 = Prev(rand4, algo); // IV1
+
+            Console.WriteLine("Found Seed: {0:X8} ({1:X8}) - {2}{3}", Prev(Prev(rand5, algo), algo), PID, option.Item1, noIVs ? " " + eReaderType(pid) : "");
+
+            Console.WriteLine("Nature: {0}", index2Nature(PID));
+
+            if (Has(algo, Algo.CanBeShiny))
+              Console.WriteLine("Shiny: Can be shiny");
+            else
+              Console.WriteLine("Shiny: Cannot be shiny");
+
+            uint[] ivs;
+
+            if (noIVs)
+              ivs = new uint[] { 0, 0, 0, 0, 0, 0 };
+            else
+              ivs = ParseStats((rand5 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
+
+            Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
+
+            if (TID == 31121) // Ageto/Colos
+              Console.WriteLine("OTG: Female (Ageto) - Male (Colos)");
+
+            another = true;
+          }
         }
-
-        Algo algo = option.Item2;
-
-        bool forcedShiny = Has(algo, Algo.ForceShiny);
-        bool WCEggs = Has(algo, Algo.WCEggs);
-        bool hasOffset = Has(algo, Algo.Offset);
-        bool berryGlitch = Has(algo, Algo.BerryGlitch);
-        bool XDAlgo = Has(algo, Algo.DFABPIDIV);
-        bool Box = Has(algo, Algo.Box);
-        bool mystryMew = TID == 6930;
-        bool batchGen = Has(algo, Algo.BatchGen);
-        bool noIVs = Has(algo, Algo.NoIVs);
-        bool forceAntishiny = Has(algo, Algo.ForceAntiShiny);
-
-        List<Tuple<uint, uint, uint>> PIDTIDs = new List<Tuple<uint, uint, uint>>();
-        bool finished = false;
-        /*
-            if (!gotTID && forceAntishiny) {
-              Console.Write("TID:");
-              uint fTid;
-              GetNumber(out fTid);
-              TID = fTid;
-            }
-        */
-        do
-        {
-            Console.Write("PID <TID> <SID>:");
-            uint pid, tid, sid;
-            finished = !GetNumber(out pid, out tid, out sid);
-            if (!finished) PIDTIDs.Add(new Tuple<uint, uint, uint>(pid, tid > 0 ? tid : TID, sid));
-        } while (!finished);
 
         Console.WriteLine("----------");
+      }
 
-        uint seedRange = Has(algo, Algo.LimitRange) ? 0x100u : 0x10000u;
+      if (WCEggs || Has(algo, Algo.PokeParkEggs))
+      {
+        bool another = false;
 
-        uint rand1, rand1a, rand1b, rand2, rand3, rand4, rand5, rand6, rand7;
-
-        for (int p = 0; p < PIDTIDs.Count; p++)
+        // Do it backwards, find a ABDE
+        for (uint i = 0; i < seedRange; i++)
         {
-            uint PID = PIDTIDs[p].Item1;
-            TID = PIDTIDs[p].Item2;
-            uint SID = PIDTIDs[p].Item3;
+          rand1 = ((PID & 0xFFFF) << 0x10) | i; // PIDL
+          rand2 = Next(rand1, algo); // PIDH
 
-            bool found = false;
+          uint pid = ((rand2 >> 0x10) << 0x10) | (rand1 >> 0x10);
 
-            if (XDAlgo)
-            {
-                bool another = false;
+          if (pid == PID)
+          {
+            if (another)
+              Console.WriteLine(" - ");
 
-                // XD - Do it backwards - DFAB
-                for (uint i = 0; XDAlgo && i < seedRange; i++)
-                {
-                    uint pid, originalSeed, seed;
-                    originalSeed = seed = ((PID & 0xFFFF) << 0x10) | i;
+            found = true;
+            Console.WriteLine("Found Wondercard Seed: {0:X8} ({1:X8}) - {2}", Prev(rand1, algo), PID, option.Item1);
 
-                    do
-                    {
-                        rand1 = seed;
-                        rand2 = Prev(rand1, algo);
-                        rand3 = Prev(rand2, algo);
+            Console.WriteLine("Nature: {0}", index2Nature(PID % 25));
 
-                        pid = ((rand2 >> 0x10) << 0x10) | (rand1 >> 0x10);
+            Console.WriteLine("Shiny: Can be shiny");
 
-                        seed = rand3;
+            rand3 = Next(rand2, algo); // forme (unown), not used.
+            rand4 = Next(rand3, algo);
+            rand5 = Next(rand4, algo);
 
-                    } while (!noIVs && isShiny(pid, TID, SID));
+            uint[] ivs = ParseStats((rand4 >> 0x10) & 0x7FFF, (rand5 >> 0x10) & 0x7FFF);
+            Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
 
-                    if (pid == PID)
-                    {
-                        if (another)
-                            Console.WriteLine(" - ");
-
-                        found = true;
-
-                        rand4 = Prev(rand3, algo); // IV2
-                        rand5 = Prev(rand4, algo); // IV1
-
-                        Console.WriteLine("Found Seed: {0:X8} ({1:X8}) - {2}{3}", Prev(Prev(rand5, algo), algo), PID, option.Item1, noIVs ? " " + eReaderType(pid) : "");
-
-                        Console.WriteLine("Nature: {0}", index2Nature(PID));
-
-                        if (Has(algo, Algo.CanBeShiny))
-                            Console.WriteLine("Shiny: Can be shiny");
-                        else
-                            Console.WriteLine("Shiny: Cannot be shiny");
-
-                        uint[] ivs;
-
-                        if (noIVs)
-                            ivs = new uint[] { 0, 0, 0, 0, 0, 0 };
-                        else
-                            ivs = ParseStats((rand5 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
-
-                        Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
-
-                        if (TID == 31121) // Ageto/Colos
-                            Console.WriteLine("OTG: Female (Ageto) - Male (Colos)");
-
-                        another = true;
-                    }
-                }
-
-                Console.WriteLine("----------");
-            }
-
-            if (WCEggs || Has(algo, Algo.PokeParkEggs))
-            {
-                bool another = false;
-
-                // Do it backwards, find a ABDE
-                for (uint i = 0; i < seedRange; i++)
-                {
-                    rand1 = (((PID & 0xFFFF) << 0x10)) | i; // PIDL
-                    rand2 = Next(rand1, algo); // PIDH
-
-                    uint pid = ((rand2 >> 0x10) << 0x10) | (rand1 >> 0x10);
-
-                    if (pid == PID)
-                    {
-                        if (another)
-                            Console.WriteLine(" - ");
-
-                        found = true;
-                        Console.WriteLine("Found Wondercard Seed: {0:X8} ({1:X8}) - {2}", Prev(rand1, algo), PID, option.Item1);
-
-                        Console.WriteLine("Nature: {0}", index2Nature(PID % 25));
-
-                        Console.WriteLine("Shiny: Can be shiny");
-
-                        rand3 = Next(rand2, algo); // forme (unown), not used.
-                        rand4 = Next(rand3, algo);
-                        rand5 = Next(rand4, algo);
-
-                        uint[] ivs = ParseStats((rand4 >> 0x10) & 0x7FFF, (rand5 >> 0x10) & 0x7FFF);
-                        Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
-
-                        another = true;
-                    }
-                }
-
-                if (WCEggs)
-                    Console.WriteLine("----------");
-            }
-
-            if (Box)
-            {
-                bool another = false;
-
-                // Do it backwards, find a BACD
-                for (uint i = 0; i < seedRange; i++)
-                {
-                    rand1 = (PID & 0xFFFF0000) | i;
-                    rand2 = Next(rand1, algo);
-
-                    uint pid = ((rand1 >> 0x10) << 0x10) | (rand2 >> 0x10);
-
-                    if (pid == PID)
-                    {
-                        if (another)
-                            Console.WriteLine(" - ");
-
-                        found = true;
-                        Console.WriteLine("Found Seed: {0:X8} ({1:X8}) - {2}", Prev(rand1, algo), PID, option.Item1);
-
-                        Console.WriteLine("Nature: {0}", index2Nature(PID % 25));
-
-                        Console.WriteLine("Shiny: Can be shiny");
-
-                        rand3 = Next(rand2, algo);
-                        rand4 = Next(rand3, algo);
-
-                        uint[] ivs = ParseStats((rand3 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
-                        Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
-
-                        another = true;
-                    }
-                }
-
-                Console.WriteLine("----------");
-            }
-
-            if (forceAntishiny)
-            {
-                bool another = false;
-
-                for (uint i = 0; i < seedRange; i++)
-                {
-                    rand2 = ((PID & 0xFFFF) << 0x10) | i;
-                    rand1 = Prev(rand2, algo);
-                    rand3 = Next(rand2, algo);
-                    rand4 = Next(rand3, algo);
-                    rand5 = Next(rand4, algo);
-                    rand6 = Next(rand5, algo);
-
-                    if (((rand2 >> 0x10) ^ TID ^ SID ^ (rand1 >> 0x10)) == (PID >> 0x10) && !isShiny(PID, TID, SID))
-                    {
-                        if (another)
-                            Console.WriteLine(" - ");
-
-                        uint seed = Prev(rand1, algo);
-
-                        found = true;
-                        Console.WriteLine("Found Seed: {0:X8} ({1:X8}) - TID {2}", seed, PID, TID);
-
-                        Console.WriteLine("Nature: {0}", index2Nature(PID % 25));
-
-                        Console.WriteLine("Shiny: Cannot be shiny");
-
-                        uint[] ivs = ParseStats((rand3 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
-                        Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
-
-                        // Console.WriteLine("OTG: {0:X} {1}", Prev(seed, algo), Prev(seed, algo) % 100);
-
-                        // Console.WriteLine("Item: {0}", (((rand6 >> 0x15) / 1) & 1) == 0 ? "Ganlon" : "Salac");
-
-                        uint d = Prev(rand1, algo);
-                        uint c = Prev(d, algo);
-                        uint b = Prev(c, algo);
-                        uint a = Prev(b, algo);
-
-                        // Console.WriteLine("Entry: {0}", GetRandomEntry((c & 0xFFFF0000) | (d >> 0x10), 5));
-                        // Console.WriteLine("Entry: {0}", (((rand6 >> 0x10) / 1) >> 0) % 3);
-                        // Console.WriteLine("Entry: {0}", GetRandomEntry(d >> 0x10, 5));
-
-                        /*uint newSeed = seed;
-
-                        for (int h = 0; h < 1000000; h++)
-                        {
-                            if (newSeed == 0xDCA0BCA8)
-                            {
-                                Console.WriteLine("Test: {0:X8} - Frame {1}", newSeed, h);
-                            }
-
-                            newSeed = Next(newSeed, algo);
-                        }*/
-
-                        another = true;
-                    }
-                }
-
-                Console.WriteLine("----------");
-            }
-
-            if (!WCEggs && !Box && (Has(algo, Algo.BACDPIDIV) || Has(algo, Algo.PokeParkEggs)))
-            {
-                for (uint i = 0; i < seedRange; i++)
-                {
-                    uint seed = rand1a = rand1b = i;
-                    uint originalSeed = seed;
-                    Tuple<string, string, uint, bool> entry = null;
-                    uint TSV = 0;
-
-                    if (hasOffset)
-                    {
-                        rand1a = Next(seed, algo);
-                        rand1b = Next(rand1a, algo);
-
-                        uint tempPid = (rand1a & 0xFFFF0000) | (rand1b >> 0x10);
-
-                        /* This never actually happens in seed range 0->FFFF
-                                  if (tempPid == 0)
-                                    tempPid |= 0x20030000;
-
-                                  if ((tempPid & 0xFFFF) == 0)
-                                    tempPid |= 0x327;
-                        */
-                        entry = GetEggEntry(tempPid, seed);
-
-                        forcedShiny = entry.Item4;
-
-                        if (forcedShiny && Has(algo, Algo.PCJP2003))
-                            algo |= Algo.CanBeShiny;
-                    }
-
-                    uint originalPID, pid, otgRand, itemRand, batchCount = 1;
-
-                    do
-                    {
-                        rand1 = Next(rand1b, algo); // PIDH
-                        rand2 = Next(rand1, algo); // PIDL
-
-                        pid = ((rand1 >> 0x10) << 0x10) | (rand2 >> 0x10);
-
-                        originalPID = pid;
-
-                        if (mystryMew)
-                        {
-                            while (isShiny(pid, TID, SID))
-                            {
-                                rand1 = Next(rand2, algo); // PIDH
-                                rand2 = Next(rand1, algo); // PIDL
-
-                                pid = ((rand1 >> 0x10) << 0x10) | (rand2 >> 0x10);
-                            }
-                        }
-
-                        if (Has(algo, Algo.PCJP2003) && PID - pid < 8)
-                        {
-                            TSV = getTSVFromPID(pid);
-                            pid = PID;
-                        }
-
-                        uint jpid = 0;
-                        uint epid = 0;
-
-                        if (forcedShiny)
-                        {
-                            rand2 = Next(rand2, algo);
-
-                            if (berryGlitch)
-                            {
-                                epid = forceShinyPID(rand1 >> 0x10, rand2 >> 0x10, 30317, SID);
-                                jpid = forceShinyPID(rand1 >> 0x10, rand2 >> 0x10, 21121, SID);
-
-                                pid = epid == PID ? epid : jpid;
-                            }
-                            else
-                            {
-                                TSV = getTSVFromForceShiny(PID);
-                                pid = forceShinyPID(rand1 >> 0x10, rand2 >> 0x10, TSV, SID);
-                                originalPID = pid;
-                            }
-                        }
-
-                        rand3 = Next(rand2, algo); // IV1
-                        rand4 = Next(rand3, algo); // IV2
-                        rand5 = Next(rand4, algo); // Item if available or OTG if Item not available
-                        rand6 = Next(rand5, algo); // OTG if Item available
-                        rand7 = Next(rand6, algo);
-
-                        itemRand = Has(algo, Algo.ItemFirst) ? rand5 : rand6;
-                        otgRand = !Has(algo, Algo.ItemFirst) ? rand5 : rand6;
-
-                        if (pid != PID)
-                        {
-                            // in case of antishiny, we have to go back.
-                            rand1b = Next(Next(Next(Next(Next(rand1b, algo), algo), algo), algo), algo); // PID, IV, OTG -> next in batch.
-                        }
-
-                        batchCount++;
-
-                    } while (batchGen && pid != PID && batchCount <= 5);
-
-                    if (batchCount > 6 || pid != PID)
-                        continue;
-
-                    found = true;
-                    string knownSeed = "Found Seed";
-
-                    if (berryGlitch)
-                        knownSeed = originalSeed >= 3 && originalSeed <= 180 ? "Known Seed" : "Unknown Seed";
-
-                    string mystryMewBatch = "";
-
-                    if (mystryMew)
-                    {
-                        knownSeed = MystryMewSeeds.Contains(rand1b) ? "Known Seed" : "Unknown Seed";
-
-                        if (knownSeed == "Known Seed")
-                        {
-                            long mewIndex = Array.IndexOf(MystryMewSeeds, rand1b) + 1;
-                            mystryMewBatch = String.Format("{0}/{1} {2}", mewIndex, MystryMewSeeds.Length, String.Format("{0} Slot {1}", mewIndex < 7 ? "Party" : "PC", mewIndex < 7 ? mewIndex : mewIndex - 6));
-                        }
-                        else
-                            mystryMewBatch = String.Format(" ({0} of 5)", batchCount);
-                    }
-
-                    Console.WriteLine("{0}: {1:X8} - {2} {3}", knownSeed, i, option.Item1, mystryMewBatch);
-                    Console.WriteLine("PID: {0:X8} ({1})", PID, index2Nature(PID % 25));
-
-                    uint rtc = seed ^ (seed < 0x5A0u ? 0x10001u : 0x0u);
-
-                    if (hasOffset)
-                    {
-                        uint days = rtc / 1440;
-                        uint hours = rtc % 1440 / 60;
-                        uint mins = rtc % 60;
-                        Console.WriteLine("RTC: {0} day{1}, {2} hour{3}, {4} minute{5}", days, days != 0 ? "s" : "", hours, hours != 0 ? "s" : "", mins, mins != 0 ? "s" : "");
-
-                        if (Has(algo, Algo.PCJP2003))
-                        {
-                            Console.WriteLine("Species: {1}{0} {2}", entry.Item1, entry.Item4 ? "Forced Shiny " : pid - originalPID > 0 && pid - originalPID < 8 ? "Anti-Shiny " : "", entry.Item2);
-                            Console.WriteLine("TSV: {0:X4}", TSV);
-                        }
-                    }
-
-                    if (Has(algo, Algo.PCJP2003) && !forcedShiny)
-                        Console.WriteLine("Shiny: Cannot be shiny if hatched by original trainer");
-                    else if (Has(algo, Algo.CanBeShiny))
-                        Console.WriteLine("Shiny: Can be shiny");
-                    else if (forcedShiny)
-                        Console.WriteLine("Shiny: Must be shiny");
-                    else
-                        Console.WriteLine("Shiny: Cannot be shiny");
-
-                    uint[] ivs;
-
-                    if (Has(algo, Algo.NoIVs))
-                        ivs = new uint[] { 0, 0, 0, 0, 0, 0 };
-                    else
-                        ivs = ParseStats((rand3 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
-
-                    Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
-
-                    if (Has(algo, Algo.BerryGlitch))
-                        Console.WriteLine("OTG: {0}", ((otgRand >> 0x10) / 3 & 1) == 1 ? "Female (RUBY)" : "Male (SAPHIRE)");
-                    else if (Has(algo, Algo.RandOTG3))
-                        Console.WriteLine("OTG: {0}", ((otgRand >> 0x17) / 1 & 1) == 0 ? "Female" : "Male");
-                    else if (Has(algo, Algo.RandOTG2))
-                    {
-                        if (TID == 50701)
-                        {
-                            Console.WriteLine("Sunday Wob OTG: {0}", ((otgRand >> 0x13) / 1 & 1) == 1 ? "Female" : "Male");
-                            Console.WriteLine("Sapporo Pikachu OTG: Male (Always)");
-                        }
-                        else
-                            Console.WriteLine("OTG: {0}", ((otgRand >> 0x13) / 1 & 1) == 1 ? "Female" : "Male");
-                    }
-                    else if (Has(algo, Algo.RandOTG1))
-                        Console.WriteLine("OTG: {0}", ((otgRand >> 0x10) / 3 & 1) == 1 ? "Female" : "Male");
-                    else if (Has(algo, Algo.MaleOTG))
-                        Console.WriteLine("OTG: Male (Always)");
-                    else if (Has(algo, Algo.FemaleOTG))
-                        Console.WriteLine("OTG: Female (Always)");
-                    else if (Has(algo, Algo.RandOTG4))
-                        Console.WriteLine("OTG: {0} (Not Definitive)", (((otgRand >> 0x1E) / 1) & 1) == 1 ? "Female" : "Male");
-
-                    if (Has(algo, Algo.RandItem3))
-                        Console.WriteLine("Item: {0}", ((itemRand >> 0x17) & 1) == 0 ? "Salac Berry" : "Ganlon Berry");
-                    else if (Has(algo, Algo.RandItem2))
-                        Console.WriteLine("Item: {0}", ((itemRand >> 0x13) & 1) == 0 ? "Salac Berry" : "Ganlon Berry");
-                    else if (Has(algo, Algo.RandItem1))
-                    {
-                        if (Has(algo, Algo.WSHMKR))
-                            Console.WriteLine("Item: {0}", ((itemRand >> 0x10) / 3 & 1) == 0 ? "Salac Berry" : "Ganlon Berry");
-                        else if (hasOffset)
-                        {
-                            string berry = String.Format("Ganlon Berry ({0}), Salac Berry ({1})", (rtc & 0x1) == 0 ? "99.8%" : "0.2%", (rtc & 0x1) == 1 ? "99.8%" : "0.2%");
-
-                            Console.WriteLine("Item: {0}", berry);
-                        }
-                        else
-                            Console.WriteLine("Item: {0}", ((itemRand >> 0x10) / 3 & 1) == 0 ? "Petaya Berry" : "Apicot Berry");
-                    }
-                }
-
-                if (!found)
-                    Console.WriteLine("No seeds found for {0:X8}", PID);
-
-                Console.WriteLine("----------");
-            }
+            another = true;
+          }
         }
 
-        Console.WriteLine("Complete. Press enter to exit.");
-        Console.ReadLine();
-    }
+        if (WCEggs)
+          Console.WriteLine("----------");
+      }
 
-    public static bool isShiny(uint pid, uint tid, uint sid)
-    {
-        return ((pid >> 16) ^ (pid & 0xFFFF) ^ tid ^ sid) < 8;
-    }
+      if (Box)
+      {
+        bool another = false;
 
-    public static uint forceShinyPID(uint seed, uint shiny, uint tid, uint sid)
-    {
-        return (seed << 0x10) | ((seed ^ tid ^ sid) & 0xFFF8) | (shiny & 7);
-    }
-
-    public static uint getTSVFromForceShiny(uint pid)
-    {
-        return (pid >> 0x10) ^ (pid & 0xFFF8);
-    }
-
-    public static uint getTSVFromPID(uint pid)
-    {
-        return (pid >> 0x10) ^ (pid & 0xFFFF);
-    }
-
-    public static bool Has(Algo algo, Algo option)
-    {
-        return (algo & option) != 0;
-    }
-
-    public static bool GetNumber(out uint number)
-    {
-        uint tid, sid;
-
-        return GetNumber(out number, out tid, out sid);
-    }
-
-    public static bool GetNumber(out uint pid, out uint tid, out uint sid)
-    {
-        string[] line = Console.ReadLine().Trim().Split(' ');
-
-        if (String.IsNullOrEmpty(line[0]))
+        // Do it backwards, find a BACD
+        for (uint i = 0; i < seedRange; i++)
         {
-            pid = tid = sid = 0;
-            return false;
+          rand1 = (PID & 0xFFFF0000) | i;
+          rand2 = Next(rand1, algo);
+
+          uint pid = ((rand1 >> 0x10) << 0x10) | (rand2 >> 0x10);
+
+          if (pid == PID)
+          {
+            if (another)
+              Console.WriteLine(" - ");
+
+            found = true;
+            Console.WriteLine("Found Seed: {0:X8} ({1:X8}) - {2}", Prev(rand1, algo), PID, option.Item1);
+
+            Console.WriteLine("Nature: {0}", index2Nature(PID % 25));
+
+            Console.WriteLine("Shiny: Can be shiny");
+
+            rand3 = Next(rand2, algo);
+            rand4 = Next(rand3, algo);
+
+            uint[] ivs = ParseStats((rand3 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
+            Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
+
+            another = true;
+          }
         }
 
-        bool fail = false;
+        Console.WriteLine("----------");
+      }
 
-        if (line[0].StartsWith("0x"))
-            fail = UInt32.TryParse(line[0].Replace("0x", ""), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out pid) && fail;
-        else
-            fail = UInt32.TryParse(line[0], out pid) && fail;
+      if (forceAntishiny)
+      {
+        bool another = false;
 
-        if (line.Length > 1 && line[1].StartsWith("0x"))
-            fail = UInt32.TryParse(line[1].Replace("0x", ""), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out tid) && fail;
-        else if (line.Length > 1)
-            fail = UInt32.TryParse(line[1], out tid) && fail;
-        else
-            tid = 0;
-
-        if (line.Length > 2 && line[2].StartsWith("0x"))
-            fail = UInt32.TryParse(line[2].Replace("0x", ""), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out sid) && fail;
-        else if (line.Length > 2)
-            fail = UInt32.TryParse(line[2], out sid) && fail;
-        else
-            sid = 0;
-
-        return !fail;
-    }
-
-    public static uint GetRandomEntry(uint randVal, uint max)
-    {
-        uint high = randVal >> 16;
-        uint first = ((high << 2) & 0xFFFF) + high;
-        uint second = ((randVal & 0xFFFF) << 1) + (first >> 16);
-
-        second += high + (second >> 16);
-
-        return (max * (second & 0xFFFF)) >> 16;
-    }
-
-    public static Tuple<string, string, uint, bool> GetEggEntry(uint randVal, uint seed)
-    {
-        uint result = GetRandomEntry(randVal, 1000);
-        int count = 0;
-
-        while (true)
+        for (uint i = 0; i < seedRange; i++)
         {
-            if (result < PCJP2003Types[count].Item3)
-                return PCJP2003Types[count];
+          rand2 = ((PID & 0xFFFF) << 0x10) | i;
+          rand1 = Prev(rand2, algo);
+          rand3 = Next(rand2, algo);
+          rand4 = Next(rand3, algo);
+          //rand5 = Next(rand4, algo);
+          //rand6 = Next(rand5, algo);
 
-            result -= PCJP2003Types[count++].Item3;
+          if (((rand2 >> 0x10) ^ TID ^ SID ^ (rand1 >> 0x10)) == (PID >> 0x10) && !isShiny(PID, TID, SID))
+          {
+            if (another)
+              Console.WriteLine(" - ");
+
+            uint seed = Prev(rand1, algo);
+
+            found = true;
+            Console.WriteLine("Found Seed: {0:X8} ({1:X8}) - TID {2}", seed, PID, TID);
+
+            Console.WriteLine("Nature: {0}", index2Nature(PID % 25));
+
+            Console.WriteLine("Shiny: Cannot be shiny");
+
+            uint[] ivs = ParseStats((rand3 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
+            Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
+
+            // Console.WriteLine("OTG: {0:X} {1}", Prev(seed, algo), Prev(seed, algo) % 100);
+
+            // Console.WriteLine("Item: {0}", (((rand6 >> 0x15) / 1) & 1) == 0 ? "Ganlon" : "Salac");
+
+            uint d = Prev(rand1, algo);
+            uint c = Prev(d, algo);
+            uint b = Prev(c, algo);
+            uint a = Prev(b, algo);
+
+            // Console.WriteLine("Entry: {0}", GetRandomEntry((c & 0xFFFF0000) | (d >> 0x10), 5));
+            // Console.WriteLine("Entry: {0}", (((rand6 >> 0x10) / 1) >> 0) % 3);
+            // Console.WriteLine("Entry: {0}", GetRandomEntry(d >> 0x10, 5));
+
+            /*uint newSeed = seed;
+
+            for (int h = 0; h < 1000000; h++)
+            {
+                if (newSeed == 0xDCA0BCA8)
+                {
+                    Console.WriteLine("Test: {0:X8} - Frame {1}", newSeed, h);
+                }
+
+                newSeed = Next(newSeed, algo);
+            }*/
+
+            another = true;
+          }
         }
+
+        Console.WriteLine("----------");
+      }
+
+      if (!WCEggs && !Box && (Has(algo, Algo.BACDPIDIV) || Has(algo, Algo.PokeParkEggs)))
+      {
+        for (uint i = 0; i < seedRange; i++)
+        {
+          uint seed = rand1b = i;
+          uint originalSeed = seed;
+          Tuple<string, string, uint, bool> entry = null;
+          uint TSV = 0;
+
+          if (hasOffset)
+          {
+            rand1a = Next(seed, algo);
+            rand1b = Next(rand1a, algo);
+
+            uint tempPid = (rand1a & 0xFFFF0000) | (rand1b >> 0x10);
+
+            /* This never actually happens in seed range 0->FFFF
+                      if (tempPid == 0)
+                        tempPid |= 0x20030000;
+
+                      if ((tempPid & 0xFFFF) == 0)
+                        tempPid |= 0x327;
+            */
+            entry = GetEggEntry(tempPid, seed);
+
+            forcedShiny = entry.Item4;
+
+            if (forcedShiny && Has(algo, Algo.PCJP2003))
+              algo |= Algo.CanBeShiny;
+          }
+
+          uint originalPID, pid, otgRand, itemRand, batchCount = 1;
+
+          do
+          {
+            rand1 = Next(rand1b, algo); // PIDH
+            rand2 = Next(rand1, algo); // PIDL
+
+            pid = ((rand1 >> 0x10) << 0x10) | (rand2 >> 0x10);
+
+            originalPID = pid;
+
+            if (mystryMew)
+            {
+              while (isShiny(pid, TID, SID))
+              {
+                rand1 = Next(rand2, algo); // PIDH
+                rand2 = Next(rand1, algo); // PIDL
+
+                pid = ((rand1 >> 0x10) << 0x10) | (rand2 >> 0x10);
+              }
+            }
+
+            if (Has(algo, Algo.PCJP2003) && PID - pid < 8)
+            {
+              TSV = getTSVFromPID(pid);
+              pid = PID;
+            }
+
+
+            if (forcedShiny)
+            {
+              rand2 = Next(rand2, algo);
+
+              if (berryGlitch)
+              {
+                uint epid = forceShinyPID(rand1 >> 0x10, rand2 >> 0x10, 30317, SID);
+                uint jpid = forceShinyPID(rand1 >> 0x10, rand2 >> 0x10, 21121, SID);
+
+                pid = epid == PID ? epid : jpid;
+              }
+              else
+              {
+                TSV = getTSVFromForceShiny(PID);
+                pid = forceShinyPID(rand1 >> 0x10, rand2 >> 0x10, TSV, SID);
+                originalPID = pid;
+              }
+            }
+
+            rand3 = Next(rand2, algo); // IV1
+            rand4 = Next(rand3, algo); // IV2
+            rand5 = Next(rand4, algo); // Item if available or OTG if Item not available
+            rand6 = Next(rand5, algo); // OTG if Item available
+                                       // rand7 = Next(rand6, algo);
+
+            itemRand = Has(algo, Algo.ItemFirst) ? rand5 : rand6;
+            otgRand = !Has(algo, Algo.ItemFirst) ? rand5 : rand6;
+
+            if (pid != PID)
+            {
+              // in case of antishiny, we have to go back.
+              rand1b = Next(Next(Next(Next(Next(rand1b, algo), algo), algo), algo), algo); // PID, IV, OTG -> next in batch.
+            }
+
+            batchCount++;
+
+          } while (batchGen && pid != PID && batchCount <= 5);
+
+          if (batchCount > 6 || pid != PID)
+            continue;
+
+          found = true;
+          string knownSeed = "Found Seed";
+
+          if (berryGlitch)
+            knownSeed = originalSeed >= 3 && originalSeed <= 180 ? "Known Seed" : "Unknown Seed";
+
+          string mystryMewBatch = "";
+
+          if (mystryMew)
+          {
+            knownSeed = MystryMewSeeds.Contains(rand1b) ? "Known Seed" : "Unknown Seed";
+
+            if (knownSeed == "Known Seed")
+            {
+              long mewIndex = Array.IndexOf(MystryMewSeeds, rand1b) + 1;
+              string batchSlot;
+              if (mewIndex < 426)
+                batchSlot = String.Format("{0} Slot {1}", mewIndex < 7 ? "Party" : "PC", mewIndex < 7 ? mewIndex : mewIndex - 6);
+              else
+                batchSlot = "Unreleased";
+
+              mystryMewBatch = String.Format("{0}/{1} {2}", mewIndex, MystryMewSeeds.Length, batchSlot);
+            }
+            else
+              mystryMewBatch = String.Format(" ({0} of 5)", batchCount - 1);
+          }
+
+          Console.WriteLine("{0}: {1:X8} - {2} {3}", knownSeed, i, option.Item1, mystryMewBatch);
+          Console.WriteLine("PID: {0:X8} ({1})", PID, index2Nature(PID % 25));
+
+          uint rtc = seed ^ (seed < 0x5A0u ? 0x10001u : 0x0u);
+
+          if (hasOffset)
+          {
+            uint days = rtc / 1440;
+            uint hours = rtc % 1440 / 60;
+            uint mins = rtc % 60;
+            Console.WriteLine("RTC: {0} day{1}, {2} hour{3}, {4} minute{5}", days, days != 0 ? "s" : "", hours, hours != 0 ? "s" : "", mins, mins != 0 ? "s" : "");
+
+            if (Has(algo, Algo.PCJP2003))
+            {
+              Console.WriteLine("Species: {1}{0} {2}", entry.Item1, entry.Item4 ? "Forced Shiny " : pid - originalPID > 0 && pid - originalPID < 8 ? "Anti-Shiny " : "", entry.Item2);
+              Console.WriteLine("TSV: {0:X4}", TSV);
+            }
+          }
+
+          if (Has(algo, Algo.PCJP2003) && !forcedShiny)
+            Console.WriteLine("Shiny: Cannot be shiny if hatched by original trainer");
+          else if (Has(algo, Algo.CanBeShiny))
+            Console.WriteLine("Shiny: Can be shiny");
+          else if (forcedShiny)
+            Console.WriteLine("Shiny: Must be shiny");
+          else
+            Console.WriteLine("Shiny: Cannot be shiny");
+
+          uint[] ivs;
+
+          if (Has(algo, Algo.NoIVs))
+            ivs = new uint[] { 0, 0, 0, 0, 0, 0 };
+          else
+            ivs = ParseStats((rand3 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
+
+          Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
+
+          if (Has(algo, Algo.BerryGlitch))
+            Console.WriteLine("OTG: {0}", ((otgRand >> 0x10) / 3 & 1) == 1 ? "Female (RUBY)" : "Male (SAPHIRE)");
+          else if (Has(algo, Algo.RandOTG3))
+            Console.WriteLine("OTG: {0}", ((otgRand >> 0x17) / 1 & 1) == 0 ? "Female" : "Male");
+          else if (Has(algo, Algo.RandOTG2))
+          {
+            if (TID == 50701)
+            {
+              Console.WriteLine("Sunday Wob OTG: {0}", ((otgRand >> 0x13) / 1 & 1) == 1 ? "Female" : "Male");
+              Console.WriteLine("Sapporo Pikachu OTG: Male (Always)");
+            }
+            else
+              Console.WriteLine("OTG: {0}", ((otgRand >> 0x13) / 1 & 1) == 1 ? "Female" : "Male");
+          }
+          else if (Has(algo, Algo.RandOTG1))
+            Console.WriteLine("OTG: {0}", ((otgRand >> 0x10) / 3 & 1) == 1 ? "Female" : "Male");
+          else if (Has(algo, Algo.MaleOTG))
+            Console.WriteLine("OTG: Male (Always)");
+          else if (Has(algo, Algo.FemaleOTG))
+            Console.WriteLine("OTG: Female (Always)");
+          else if (Has(algo, Algo.UnknownOTG))
+            Console.WriteLine("OTG: Unknown");
+
+          if (Has(algo, Algo.RandItem3))
+            Console.WriteLine("Item: {0}", ((itemRand >> 0x17) & 1) == 0 ? "Salac Berry" : "Ganlon Berry");
+          else if (Has(algo, Algo.RandItem2))
+            Console.WriteLine("Item: {0}", ((itemRand >> 0x13) & 1) == 0 ? "Salac Berry" : "Ganlon Berry");
+          else if (Has(algo, Algo.RandItem1))
+          {
+            if (Has(algo, Algo.WSHMKR))
+              Console.WriteLine("Item: {0}", ((itemRand >> 0x10) / 3 & 1) == 0 ? "Salac Berry" : "Ganlon Berry");
+            else if (hasOffset)
+            {
+              string berry = String.Format("Ganlon Berry ({0}), Salac Berry ({1})", (rtc & 0x1) == 0 ? "99.8%" : "0.2%", (rtc & 0x1) == 1 ? "99.8%" : "0.2%");
+
+              Console.WriteLine("Item: {0}", berry);
+            }
+            else
+              Console.WriteLine("Item: {0}", ((itemRand >> 0x10) / 3 & 1) == 0 ? "Petaya Berry" : "Apicot Berry");
+          }
+        }
+
+        if (!found)
+          Console.WriteLine("No seeds found for {0:X8}", PID);
+
+        Console.WriteLine("----------");
+      }
     }
 
-    public static Tuple<string, string, uint, bool>[] PCJP2003Types = new Tuple<string, string, uint, bool>[]
+    Console.WriteLine("Complete. Press enter to exit.");
+    Console.ReadLine();
+  }
+
+  public static bool isShiny(uint pid, uint tid, uint sid)
+  {
+    return ((pid >> 16) ^ (pid & 0xFFFF) ^ tid ^ sid) < 8;
+  }
+
+  public static uint forceShinyPID(uint seed, uint shiny, uint tid, uint sid)
+  {
+    return (seed << 0x10) | ((seed ^ tid ^ sid) & 0xFFF8) | (shiny & 7);
+  }
+
+  public static uint getTSVFromForceShiny(uint pid)
+  {
+    return (pid >> 0x10) ^ (pid & 0xFFF8);
+  }
+
+  public static uint getTSVFromPID(uint pid)
+  {
+    return (pid >> 0x10) ^ (pid & 0xFFFF);
+  }
+
+  public static bool Has(Algo algo, Algo option)
+  {
+    return (algo & option) != 0;
+  }
+
+  public static bool GetNumber(out uint number)
+  {
+
+    return GetNumber(out number, out _, out _);
+  }
+
+  public static bool GetNumber(out uint pid, out uint tid, out uint sid)
+  {
+    string[] line = Console.ReadLine().Trim().Split(' ');
+
+    if (String.IsNullOrEmpty(line[0]))
     {
-      new Tuple<string,string,uint,bool>("Pichu","Teeter Dance",100, false),
-      new Tuple<string,string,uint,bool>("Pichu","Teeter Dance",25, true),
-      new Tuple<string,string,uint,bool>("Pichu","Wish",100, false),
-      new Tuple<string,string,uint,bool>("Pichu","Wish",25, true),
-      new Tuple<string,string,uint,bool>("Bagon","Iron Defense",125, false),
-      new Tuple<string,string,uint,bool>("Bagon","Wish",125, false),
-      new Tuple<string,string,uint,bool>("Absol","Spite",125, false),
-      new Tuple<string,string,uint,bool>("Absol","Wish",125, false),
-      new Tuple<string,string,uint,bool>("Ralts","Charm",125, false),
-      new Tuple<string,string,uint,bool>("Ralts","Wish",125, false),
+      pid = tid = sid = 0;
+      return false;
+    }
+
+    bool fail = false;
+
+    if (line[0].StartsWith("0x", StringComparison.Ordinal))
+      fail = UInt32.TryParse(line[0].Replace("0x", ""), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out pid) && fail;
+    else
+      fail = UInt32.TryParse(line[0], out pid) && fail;
+
+    if (line.Length > 1 && line[1].StartsWith("0x", StringComparison.Ordinal))
+      fail = UInt32.TryParse(line[1].Replace("0x", ""), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out tid) && fail;
+    else if (line.Length > 1)
+      fail = UInt32.TryParse(line[1], out tid) && fail;
+    else
+      tid = 0;
+
+    if (line.Length > 2 && line[2].StartsWith("0x", StringComparison.Ordinal))
+      fail = UInt32.TryParse(line[2].Replace("0x", ""), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out sid) && fail;
+    else if (line.Length > 2)
+      fail = UInt32.TryParse(line[2], out sid) && fail;
+    else
+      sid = 0;
+
+    return !fail;
+  }
+
+  public static uint GetRandomEntry(uint randVal, uint max)
+  {
+    uint high = randVal >> 16;
+    uint first = ((high << 2) & 0xFFFF) + high;
+    uint second = ((randVal & 0xFFFF) << 1) + (first >> 16);
+
+    second += high + (second >> 16);
+
+    return (max * (second & 0xFFFF)) >> 16;
+  }
+
+  public static Tuple<string, string, uint, bool> GetEggEntry(uint randVal, uint seed)
+  {
+    uint result = GetRandomEntry(randVal, 1000);
+    int count = 0;
+
+    while (true)
+    {
+      if (result < PCJP2003Types[count].Item3)
+        return PCJP2003Types[count];
+
+      result -= PCJP2003Types[count++].Item3;
+    }
+  }
+
+  public static Tuple<string, string, uint, bool>[] PCJP2003Types = {
+      new Tuple<string,string,uint,bool>("Pichu", "Teeter Dance", 100, false),
+      new Tuple<string,string,uint,bool>("Pichu", "Teeter Dance", 25, true),
+      new Tuple<string,string,uint,bool>("Pichu", "Wish", 100, false),
+      new Tuple<string,string,uint,bool>("Pichu", "Wish", 25, true),
+      new Tuple<string,string,uint,bool>("Bagon", "Iron Defense", 125, false),
+      new Tuple<string,string,uint,bool>("Bagon", "Wish", 125, false),
+      new Tuple<string,string,uint,bool>("Absol", "Spite", 125, false),
+      new Tuple<string,string,uint,bool>("Absol", "Wish", 125, false),
+      new Tuple<string,string,uint,bool>("Ralts", "Charm", 125, false),
+      new Tuple<string,string,uint,bool>("Ralts", "Wish", 125, false),
     };
 
-    public static uint Prev(uint seed, Algo algo)
+  public static uint Prev(uint seed, Algo algo)
+  {
+    return Has(algo, Algo.BACDPIDIV) || Has(algo, Algo.PokeParkEggs) || Has(algo, Algo.WCEggs) || Has(algo, Algo.ForceAntiShiny) ? PrevGBA(seed) : PrevXD(seed);
+  }
+
+  public static uint Next(uint seed, Algo algo)
+  {
+    return Has(algo, Algo.BACDPIDIV) || Has(algo, Algo.PokeParkEggs) || Has(algo, Algo.WCEggs) || Has(algo, Algo.ForceAntiShiny) ? NextGBA(seed) : NextXD(seed);
+  }
+
+  public static uint PrevXD(uint seed)
+  {
+    return seed * 0xB9B33155u + 0xA170F641u;
+  }
+
+  public static uint NextXD(uint seed)
+  {
+    return seed * 0x343FDu + 0x269EC3u;
+  }
+
+  public static uint PrevGBA(uint seed)
+  {
+    return seed * 0xEEB9EB65u + 0xA3561A1u;
+  }
+
+  public static uint NextGBA(uint seed)
+  {
+    return seed * 0x41C64E6Du + 0x00006073u;
+  }
+
+  public static string eReaderType(uint pid)
+  {
+    uint nature = pid % 25;
+
+    if (nature == 16 && pid % 256 < 128) // Mareep
+      return "Mareep";
+    if (nature == 11 && pid % 256 >= 128) // Scizor
+      return "Scizor";
+    if (nature == 22 && pid % 256 < 32) // Togepi
+      return "Togepi";
+
+    return "HACKED";
+  }
+
+  public static string index2Nature(uint nature)
+  {
+    switch (nature)
     {
-        return Has(algo, Algo.BACDPIDIV) || Has(algo, Algo.PokeParkEggs) || Has(algo, Algo.WCEggs) || Has(algo, Algo.ForceAntiShiny) ? PrevGBA(seed) : PrevXD(seed);
+      default: return "Hardy";
+      case 1: return "Lonely";
+      case 2: return "Brave";
+      case 3: return "Adamant";
+      case 4: return "Naughty";
+      case 5: return "Bold";
+      case 6: return "Docile";
+      case 7: return "Relaxed";
+      case 8: return "Impish";
+      case 9: return "Lax";
+      case 10: return "Timid";
+      case 11: return "Hasty";
+      case 12: return "Serious";
+      case 13: return "Jolly";
+      case 14: return "Naive";
+      case 15: return "Modest";
+      case 16: return "Mild";
+      case 17: return "Quiet";
+      case 18: return "Bashful";
+      case 19: return "Rash";
+      case 20: return "Calm";
+      case 21: return "Gentle";
+      case 22: return "Sassy";
+      case 23: return "Careful";
+      case 24: return "Quirky";
     }
+  }
 
-    public static uint Next(uint seed, Algo algo)
-    {
-        return Has(algo, Algo.BACDPIDIV) || Has(algo, Algo.PokeParkEggs) || Has(algo, Algo.WCEggs) || Has(algo, Algo.ForceAntiShiny) ? NextGBA(seed) : NextXD(seed);
-    }
+  public static uint[] ParseStats(uint first, uint second)
+  {
+    uint[] stats = new uint[6];
 
-    public static uint PrevXD(uint seed)
-    {
-        return seed * 0xB9B33155u + 0xA170F641u;
-    }
+    stats[0] = first & 0x1F; //HP
+    stats[1] = (first & 0x3E0) >> 0x5; //Attack
+    stats[2] = (first & 0x7C00) >> 0xA; //Defense
 
-    public static uint NextXD(uint seed)
-    {
-        return seed * 0x343FDu + 0x269EC3u;
-    }
+    stats[3] = second & 0x1F; //Speed
+    stats[4] = (second & 0x3E0) >> 0x5; //Sp. Attack
+    stats[5] = (second & 0x7C00) >> 0xA; //Sp. Defense
 
-    public static uint PrevGBA(uint seed)
-    {
-        return seed * 0xEEB9EB65u + 0xA3561A1u;
-    }
-
-    public static uint NextGBA(uint seed)
-    {
-        return seed * 0x41C64E6Du + 0x00006073u;
-    }
-
-    public static string eReaderType(uint pid)
-    {
-        uint nature = pid % 25;
-
-        if (nature == 16 && pid % 256 < 128) // Mareep
-            return "Mareep";
-        else if (nature == 11 && pid % 256 >= 128) // Scizor
-            return "Scizor";
-        else if (nature == 22 && pid % 256 < 32) // Togepi
-            return "Togepi";
-
-        return "HACKED";
-    }
-
-    public static string index2Nature(uint nature)
-    {
-        switch (nature)
-        {
-            default:
-            case 0: return "Hardy";
-            case 1: return "Lonely";
-            case 2: return "Brave";
-            case 3: return "Adamant";
-            case 4: return "Naughty";
-            case 5: return "Bold";
-            case 6: return "Docile";
-            case 7: return "Relaxed";
-            case 8: return "Impish";
-            case 9: return "Lax";
-            case 10: return "Timid";
-            case 11: return "Hasty";
-            case 12: return "Serious";
-            case 13: return "Jolly";
-            case 14: return "Naive";
-            case 15: return "Modest";
-            case 16: return "Mild";
-            case 17: return "Quiet";
-            case 18: return "Bashful";
-            case 19: return "Rash";
-            case 20: return "Calm";
-            case 21: return "Gentle";
-            case 22: return "Sassy";
-            case 23: return "Careful";
-            case 24: return "Quirky";
-        }
-    }
-
-    public static uint[] ParseStats(uint first, uint second)
-    {
-        uint[] stats = new uint[6];
-
-        stats[0] = first & 0x1F; //HP
-        stats[1] = (first & 0x3E0) >> 0x5; //Attack
-        stats[2] = (first & 0x7C00) >> 0xA; //Defense
-
-        stats[3] = second & 0x1F; //Speed
-        stats[4] = (second & 0x3E0) >> 0x5; //Sp. Attack
-        stats[5] = (second & 0x7C00) >> 0xA; //Sp. Defense
-
-        return stats;
-    }
+    return stats;
+  }
 }
