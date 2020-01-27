@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Gen3EventLegality
 {
-	public class Program
+	public static class Program
 	{
 
 		[Flags]
