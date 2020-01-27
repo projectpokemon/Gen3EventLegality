@@ -7,6 +7,7 @@ namespace Gen3EventLegality
 {
 	public static class Program
 	{
+		private static string version = "2.0";
 
 		[Flags]
 		public enum Algo : ulong
@@ -216,6 +217,8 @@ namespace Gen3EventLegality
 
 		public static void Main(string[] args)
 		{
+			Console.WriteLine("3rd Gen Legality Checker by Sabresite (v{0})", version);
+			
 			Console.WriteLine("If an egg event or PCNY, press enter");
 			Console.Write("TID:");
 			uint[] numbers = GetNumbers();
@@ -334,17 +337,9 @@ namespace Gen3EventLegality
 
 							Console.WriteLine("Nature: {0}", index2Nature(PID));
 
-							if (Has(algo, Algo.CanBeShiny))
-								Console.WriteLine("Shiny: Can be shiny");
-							else
-								Console.WriteLine("Shiny: Cannot be shiny");
+							Console.WriteLine(Has(algo, Algo.CanBeShiny) ? "Shiny: Can be shiny" : "Shiny: Cannot be shiny");
 
-							uint[] ivs;
-
-							if (noIVs)
-								ivs = new uint[] { 0, 0, 0, 0, 0, 0 };
-							else
-								ivs = ParseStats((rand5 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
+							var ivs = noIVs ? new uint[] { 0, 0, 0, 0, 0, 0 } : ParseStats((rand5 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
 
 							Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
 
@@ -434,7 +429,6 @@ namespace Gen3EventLegality
 					Console.WriteLine("----------");
 				}
 
-				uint rand6;
 				if (forceAntishiny)
 				{
 					bool another = false;
@@ -447,7 +441,7 @@ namespace Gen3EventLegality
 						rand4 = Next(rand3, algo);
 						rand5 = Next(rand4, algo);
 
-						if (((rand2 >> 0x10) ^ TID ^ SID ^ (rand1 >> 0x10)) == (PID >> 0x10) && !isShiny(PID, TID, SID))
+						if (((rand2 >> 0x10) ^ TID ^ SID ^ (rand1 >> 0x10)) == PID >> 0x10 && !isShiny(PID, TID, SID))
 						{
 							if (another)
 								Console.WriteLine(" - ");
@@ -557,7 +551,7 @@ namespace Gen3EventLegality
 							rand3 = Next(rand2, algo); // IV1
 							rand4 = Next(rand3, algo); // IV2
 							rand5 = Next(rand4, algo); // Item if available or OTG if Item not available
-							rand6 = Next(rand5, algo); // OTG if Item available
+							var rand6 = Next(rand5, algo);
 							Next(rand6, algo);
 
 							itemRand = Has(algo, Algo.ItemFirst) ? rand5 : rand6;
@@ -589,10 +583,11 @@ namespace Gen3EventLegality
 							if (knownSeed == "Known Seed")
 							{
 								long mewIndex = Array.IndexOf(MystryMewSeeds, rand1b) + 1;
-								mystryMewBatch = string.Format("{0}/{1} {2}", mewIndex, MystryMewSeeds.Length, string.Format("{0} Slot {1}", mewIndex < 7 ? "Party" : "PC", mewIndex < 7 ? mewIndex : mewIndex - 6));
+								mystryMewBatch =
+									$"{mewIndex}/{MystryMewSeeds.Length} {(mewIndex < 7 ? "Party" : "PC")} Slot {(mewIndex < 7 ? mewIndex : mewIndex - 6)}";
 							}
 							else
-								mystryMewBatch = string.Format(" ({0} of 5)", batchCount);
+								mystryMewBatch = $" ({batchCount} of 5)";
 						}
 
 						Console.WriteLine("{0}: {1:X8} - {2} {3}", knownSeed, i, option.Item1, mystryMewBatch);
@@ -623,12 +618,7 @@ namespace Gen3EventLegality
 						else
 							Console.WriteLine("Shiny: Cannot be shiny");
 
-						uint[] ivs;
-
-						if (Has(algo, Algo.NoIVs))
-							ivs = new uint[] { 0, 0, 0, 0, 0, 0 };
-						else
-							ivs = ParseStats((rand3 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
+						var ivs = Has(algo, Algo.NoIVs) ? new uint[] { 0, 0, 0, 0, 0, 0 } : ParseStats((rand3 >> 0x10) & 0x7FFF, (rand4 >> 0x10) & 0x7FFF);
 
 						Console.WriteLine("IVs: {0}, {1}, {2}, {4}, {5}, {3}", ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5]);
 
@@ -791,9 +781,8 @@ namespace Gen3EventLegality
 			return "HACKED";
 		}
 
-		public static string index2Nature(uint nature)
-		{
-			return nature switch
+		public static string index2Nature(uint nature) =>
+			nature switch
 			{
 				0 => "Hardy",
 				1 => "Lonely",
@@ -822,7 +811,6 @@ namespace Gen3EventLegality
 				24 => "Quirky",
 				_ => "Hardy"
 			};
-		}
 
 		public static uint[] ParseStats(uint first, uint second)
 		{
