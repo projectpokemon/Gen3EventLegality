@@ -6,6 +6,10 @@
     <PublishAot>true</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>full</TrimMode>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <Version>3.0.0</Version>
+    <Copyright>2023</Copyright>
+    <Company>ProjectPokemon.org</Company>
   </PropertyGroup>
 
 </Project>
